@@ -4,7 +4,6 @@
 ```
 g++ -Wall -o basic_sudoku_solver basic_sudoku_solver.cpp
 ```
-
 ## Run the basic solver.
 Firstly unzip the data.zip file
 ```
@@ -20,7 +19,7 @@ You can use any dataset present in the data dir.
 
 There is a considerable impact of variable ordering on backtracking efficiency. Before Peter Norvig ever wrote a Sudoku solver he first wrote the book, and you can read all about it there. So far we've paid no heed to which cell we're assigning next, and an obvious heuristic if we're going to be more deliberate about it is to pick from among the most constrained cells (i.e., those with the fewest remaining candidates) in order to reduce the effective branching factor of our search.
 
-To achieve this, we'll add two functions and stick a call to MoveBestTodoTofront() at the top of SatisfyGivenPartialAssignment():
+To achieve this, we'll add two functions and stick a call to ```MoveBestTodoTofront()``` at the top of ```SatisfyGivenPartialAssignment()```:
 ```
 int NumCandidates(const RowColBox &row_col_box) {
     int [row, col, box] = cells_todo_[todo_index];
@@ -46,15 +45,15 @@ With these functions the  solver performance improves a bit, much better than bi
 ## Compilation for bitmask backtracking solver.
 ```
 g++ -Wall -o bitmask_solver sudoku_bitmask_backtracking.cpp
-
+```
 ## Run
-
+```
 ./bitmask_solver
-
+```
 ## Compilation steps for DPLL triad simd solver.
-
+```
 g++ -Wall -g -fpic -fno-exceptions -fno-rtti simd_sudoku_main.cpp solver_dpll_triad_simd.cpp util.cpp -o simd_solver -lm -lstdc++
-
+```
 ## Algorithm used
 
 This algorithm needs understanding of propositional logic. It is quite advanced topic in mathematics and explaining this in detail would be out of scope of this document. Here is a bit of detail for enthusiasts. Please let me know if anyone is able to grasp this. It's always good to add knowledge to the empty ocean of my wisdom.
@@ -62,9 +61,12 @@ This algorithm needs understanding of propositional logic. It is quite advanced 
 Suppose *xr<sub>cv</sub>* is a variable expressing that the cell at row *r* and column *c* contains the digit *v*, *D* is the set { 1,2,3,4,5,6,7,8,9 }, and R(i,j) and C(i,j) are functions returning the row and column respectively of the *j*th cell in the *i*th box. A minimal CNF formula representing the rules of Sudoku is a conjunction of the following clauses:
 
 **Each cell contains a value** (81 positive clauses, 9 literals each)<br>
+
 ∀<sub>r,c∈D</sub> (x<sub>rc1</sub> ∨ x<sub>rc2</sub> ∨ x<sub>rc3</sub> ∨ x<sub>rc4</sub> ∨ x<sub>rc5</sub> ∨ x<sub>rc6</sub> ∨ x<sub>rc7</sub> ∨ x<sub>rc8</sub> ∨ x<sub>rc9</sub>)
 
+
 **No row|col|box contains the same value twice** (3×81(<sup>9</sup><sub>2</sub>)=8748 binary constraint clauses)<br>
+
 ∀<sub>r,v,i,j∈D,i<j</sub> (¬x<sub>riv</sub> ∨ ¬x<sub>rjv</sub>)<br>
 ∀<sub>c,v,i,j∈D,i<j</sub> (¬x<sub>icv</sub> ∨ ¬x<sub>jcv</sub>)<br>
 ∀<sub>b,v,i,j∈D,i<j</sub> (¬x<sub>R(b,i)C(b,i)v</sub> ∨ ¬x<sub>R(b,j)C(b,j)v</sub>)<br>
