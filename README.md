@@ -16,11 +16,40 @@ Run the basic sudoku solver.
 ```
 You can use any dataset present in the data dir.
 
-With this solver the performance is really slow. You can test thid by running 
+## Impact of variable ordering
+
+There is a considerable impact of variable ordering on backtracking efficiency. Before Peter Norvig ever wrote a Sudoku solver he first wrote the book, and you can read all about it there. So far we've paid no heed to which cell we're assigning next, and an obvious heuristic if we're going to be more deliberate about it is to pick from among the most constrained cells (i.e., those with the fewest remaining candidates) in order to reduce the effective branching factor of our search.
+
+To achieve this, we'll add two functions and stick a call to MoveBestTodoTofront() at the top of SatisfyGivenPartialAssignment():
+```
+int NumCandidates(const RowColBox &row_col_box) {
+    int [row, col, box] = cells_todo_[todo_index];
+    auto candidates = rows_[row] & cols_[col] & boxes_[box];
+    return NumBitsSet(candidates);
+}
+
+void MoveBestTodoToFront(int todo_index) {
+    nth_element(cells_todo_.begin() + todo_index,
+                cells_todo_.begin() + todo_index,
+                cells_todo_.end(),
+                [&](const RowColBox &cell1, const RowColBox &cell2) {
+                    return NumCandidates(cell1) < NumCandidates(cell2);
+                });
+}
+```
+
+With these functions the  solver performance improves a bit, much better than bitmask backtracking solver. However, it still is far from the fast solvers present. It will take a lot of time(depending on hardware) to finish the dataset containing 1 million sudoku puzzles. You can test this by running
 ```
 ./basic_sudoku_solver < data/puzzles1_unbiased
 ```
-It will take a lot of time(depending on hardware) to finish the dataset containing 1 million sudoku puzzles.
+
+## Compilation for bitmask backtracking solver.
+```
+g++ -Wall -o bitmask_solver sudoku_bitmask_backtracking.cpp
+
+## Run
+
+./bitmask_solver
 
 ## Compilation steps for DPLL triad simd solver.
 
